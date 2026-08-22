@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.warehouse.backend_system.mapper.MaterialBillItemMapper">
+
+    <!-- 单条插入，xml配置自增主键回填，解决注解@Options失效bug -->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        insert into material_bill_item(bill_id,material_id,operate_num)
+        values(#{billId},#{materialId},#{operateNum})
+    </insert>
+
+
+
+</mapper>

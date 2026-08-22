@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.warehouse.backend_system.mapper.StockRecordMapper">
+
+    <!-- 近7天出入库统计，只返回数据库存在记录的日期，service层补全缺失日期填0 -->
+    <select id="selectSevenDayRecord" resultType="com.warehouse.backend_system.vo.DashboardChartVO">
+        SELECT
+            DATE(create_time) AS date,
+            SUM(IF(operate_type = '入库', change_num, 0)) AS inCount,
+            SUM(IF(operate_type = '出库', ABS(change_num), 0)) AS outCount
+        FROM stock_record
+        WHERE create_time &gt;= DATE_SUB(CURDATE(),INTERVAL 6 DAY)
+        GROUP BY DATE(create_time)
+    </select>
+
+</mapper>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.warehouse.backend_system.mapper.MaterialBillMapper">
+
+    <insert id="insertBill" useGeneratedKeys="true" keyProperty="id">
+        insert into material_bill
+        (bill_no, bill_type, operator_id, remark, bill_time, create_time, status, update_time)
+        values
+            (#{billNo},#{billType},#{operatorId},#{remark},#{billTime},#{createTime},#{status},#{updateTime})
+    </insert>
+
+
+    <select id="selectBillList" resultType="com.warehouse.backend_system.entity.MaterialBill">
+        select * from material_bill
+        <where>
+            <if test="billNo !=null and billNo !=''">
+                bill_no like concat('%',#{billNo},'%')
+            </if>
+            <if test="billType !=null">
+                AND bill_type = #{billType}
+            </if>
+        </where>
+        order by create_time desc
+    </select>
+
+    <resultMap id="BillVOResultMap" type="com.warehouse.backend_system.vo.BillVO">
+        <id column="id" property="id"/>
+        <result column="bill_no" property="billNo"/>
+        <result column="bill_type" property="billType"/>
+        <result column="operator_id" property="operatorId"/>
+        <result column="remark" property="remark"/>
+        <result column="status" property="status"/>
+        <result column="bill_time" property="billTime"/>
+        <result column="create_time" property="createTime"/>
+        <collection property="itemList" ofType="com.warehouse.backend_system.entity.MaterialBillItem">
+            <id column="item_id" property="id"/>
+            <result column="bill_id" property="billId"/>
+            <result column="material_id" property="materialId"/>
+            <result column="operate_num" property="operateNum"/>
+        </collection>
+    </resultMap>
+
+    <select id="selectBillWithItemById" resultMap="BillVOResultMap">
+        select b.*,i.id item_id,i.bill_id,i.material_id,i.operate_num
+        from material_bill b
+                 left join material_bill_item i on b.id = i.bill_id
+        where b.id = #{id}
+    </select>
+
+
+</mapper>

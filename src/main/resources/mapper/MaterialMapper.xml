@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.warehouse.backend_system.mapper.MaterialMapper">
+
+    <select id="selectByCondition" resultType="com.warehouse.backend_system.entity.Material">
+        select * from material
+        <where>
+            <if test="materialCode != null and materialCode != ''">
+                and material_code like concat('%',#{materialCode},'%')
+            </if>
+            <if test="materialName != null and materialName != ''">
+                and material_name like concat('%',#{materialName},'%')
+            </if>
+            <if test="spec != null and spec != ''">
+                and spec like concat('%',#{spec},'%')
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+        </where>
+    </select>
+
+</mapper>
