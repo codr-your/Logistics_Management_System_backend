@@ -85,4 +85,10 @@ public interface MaterialBillMapper {
     List<DashboardChartVO> selectSevenDayBillStat();
 
 
+    BillVO getOutBillMonthStat();
+    List<BillVO> getOutPieData();
+    Integer getPendingOutCount();
+
+
+
 }

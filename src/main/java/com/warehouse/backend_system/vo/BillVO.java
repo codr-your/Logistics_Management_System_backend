@@ -17,4 +17,10 @@ public class BillVO {
     private LocalDateTime createTime;
     //一张单据对应多条明细
     private List<MaterialBillItem> itemList;
+
+    private Integer monthOutCount;
+    private Integer monthOutTotal;
+    private String name;
+    private Integer value;
+// getter setter记得生成
 }

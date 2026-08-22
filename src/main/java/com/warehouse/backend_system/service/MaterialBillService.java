@@ -38,6 +38,12 @@ public interface MaterialBillService {
 
     List<MaterialBill> getLatestBill();
 
+    //本月出库统计
+    BillVO getOutBillMonthStat();
+    //出库饼图统计
+    List<BillVO> getOutPieData();
+    //待确认出库草稿数量
+    Integer getPendingOutCount();
 
 
 

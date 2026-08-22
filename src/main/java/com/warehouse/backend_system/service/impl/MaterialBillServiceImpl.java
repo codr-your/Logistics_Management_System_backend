@@ -194,4 +194,23 @@ public class MaterialBillServiceImpl implements MaterialBillService {
         public List<MaterialBill> getLatestBill() {
                 return materialBillMapper.selectLatestBill();
         }
+
+
+        @Override
+        public BillVO getOutBillMonthStat() {
+                return materialBillMapper.getOutBillMonthStat();
+        }
+
+        @Override
+        public List<BillVO> getOutPieData() {
+                return materialBillMapper.getOutPieData();
+        }
+
+        @Override
+        public Integer getPendingOutCount() {
+                return materialBillMapper.getPendingOutCount();
+        }
+
+
+
 }

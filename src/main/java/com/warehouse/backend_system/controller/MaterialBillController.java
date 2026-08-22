@@ -136,4 +136,32 @@ public class MaterialBillController {
     }
 
 
+    /**
+     * 获取本月出库统计：出库单数、出库总数量
+     */
+    @GetMapping("/outBill/monthStat")
+    public Result<BillVO> getOutMonthStat(){
+        BillVO vo = materialBillService.getOutBillMonthStat();
+        return Result.success(vo);
+    }
+
+    /**
+     * 获取出库物料占比饼图数据
+     */
+    @GetMapping("/outBill/pieData")
+    public Result<List<BillVO>> getOutPieData(){
+        List<BillVO> pieList = materialBillService.getOutPieData();
+        return Result.success(pieList);
+    }
+
+    /**
+     * 获取待确认出库单据数量（草稿 status=0）
+     */
+    @GetMapping("/outBill/pendingCount")
+    public Result<Integer> getPendingOutCount(){
+        Integer count = materialBillService.getPendingOutCount();
+        return Result.success(count);
+    }
+
+
 }

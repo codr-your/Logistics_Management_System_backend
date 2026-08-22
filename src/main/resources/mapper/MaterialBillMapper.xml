@@ -48,5 +48,36 @@
         where b.id = #{id}
     </select>
 
+    <!--本月出库统计：本月出库单数、本月出库总数量，只统计已提交 status=1，bill_type=2出库-->
+    <select id="getOutBillMonthStat" resultType="com.warehouse.backend_system.vo.BillVO">
+        SELECT
+            COUNT(DISTINCT mb.id) AS monthOutCount,
+            IFNULL(SUM(mbi.operate_num),0) AS monthOutTotal
+        FROM material_bill mb
+                 LEFT JOIN material_bill_item mbi ON mb.id = mbi.bill_id
+        WHERE mb.bill_type = 2
+          AND mb.status = 1
+          AND DATE_FORMAT(mb.bill_time,'%Y-%m') = DATE_FORMAT(NOW(),'%Y-%m')
+    </select>
+
+    <!--出库物料种类占比饼图数据，已提交出库单据-->
+    <select id="getOutPieData" resultType="com.warehouse.backend_system.vo.BillVO">
+        SELECT
+            m.material_name AS name,
+            SUM(mbi.operate_num) AS value
+        FROM material_bill mb
+            LEFT JOIN material_bill_item mbi ON mb.id = mbi.bill_id
+            LEFT JOIN material m ON mbi.material_id = m.id
+        WHERE mb.bill_type = 2 AND mb.status = 1
+        GROUP BY m.material_name
+    </select>
+
+    <!--待确认出库单据数量（status=0草稿），用于页面黄色提醒-->
+    <select id="getPendingOutCount" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM material_bill
+        WHERE bill_type = 2 AND status = 0
+    </select>
+
 
 </mapper>
