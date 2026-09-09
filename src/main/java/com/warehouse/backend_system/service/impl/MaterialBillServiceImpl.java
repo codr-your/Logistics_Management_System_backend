@@ -213,4 +213,48 @@ public class MaterialBillServiceImpl implements MaterialBillService {
 
 
 
+        //新建出库单据实现方法
+        @Override
+        @Transactional(rollbackFor = Exception.class)
+        public boolean saveDraftBill(String billNo, String billType, Long operatorId, String remark, List<MaterialBillItem> itemList) {
+                //1.校验操作人
+                SysUser operator = sysUserMapper.selectById(operatorId);
+                if(operator == null){
+                        throw new RuntimeException("操作用户不存在");
+                }
+                //2.校验单据编号不能重复
+                MaterialBill existBill = materialBillMapper.selectByBillNo(billNo);
+                if(existBill != null){
+                        throw new RuntimeException("单据编号已经存在");
+                }
+                //3.保存主表，status=0草稿，billType转数字
+                MaterialBill bill = new MaterialBill();
+                bill.setBillNo(billNo);
+                bill.setBillType(Integer.parseInt(billType));
+                bill.setOperatorId(operatorId);
+                bill.setRemark(remark);
+                bill.setBillTime(LocalDateTime.now());
+                bill.setCreateTime(LocalDateTime.now());
+                bill.setStatus(0); //草稿！！不提交
+                int insertCnt = materialBillMapper.insertBill(bill);
+                if(insertCnt <=0){
+                        throw new RuntimeException("草稿单据主表保存失败");
+                }
+                Long billId = bill.getId();
+                //4.循环保存明细
+                for(MaterialBillItem item : itemList){
+                        item.setBillId(billId);
+                        int rows = materialBillItemMapper.insert(item);
+                        if(rows <= 0){
+                                throw new RuntimeException("草稿明细保存失败");
+                        }
+                }
+                //草稿：⚠️不做库存校验、不扣库存、不插入stock_record流水
+                return true;
+        }
+
+
+
+
+
 }

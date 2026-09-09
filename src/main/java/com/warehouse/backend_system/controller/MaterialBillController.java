@@ -164,4 +164,28 @@ public class MaterialBillController {
     }
 
 
+    /**
+     * 保存草稿单据（入库/出库草稿，status=0，不操作库存）
+     */
+    @PostMapping("/saveDraft")
+    public Result<String> saveDraft(@RequestBody BillSubmitDTO dto){
+        try {
+            boolean ok = materialBillService.saveDraftBill(
+                    dto.getBillNo(),
+                    dto.getBillType(),
+                    dto.getOperatorId(),
+                    dto.getRemark(),
+                    dto.getItemList()
+            );
+            if(ok){
+                return Result.successMsg("草稿保存成功");
+            }else{
+                return Result.fail(500,"草稿保存失败");
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            return Result.fail(500,e.getMessage());
+        }
+    }
+
 }

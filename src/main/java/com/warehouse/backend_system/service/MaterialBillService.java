@@ -46,5 +46,18 @@ public interface MaterialBillService {
     Integer getPendingOutCount();
 
 
+    /**
+     * 保存草稿单据（入库/出库草稿，status=0；只存主表+明细，不修改库存、不生成库存流水）
+     * @param billNo 单据编号
+     * @param billType "1"入库 / "2"出库 字符串
+     * @param operatorId 操作人id
+     * @param remark 备注
+     * @param itemList 明细列表
+     * @return 成功true
+     */
+    boolean saveDraftBill(String billNo, String billType, Long operatorId, String remark, List<MaterialBillItem> itemList);
+
+
+
 
 }
