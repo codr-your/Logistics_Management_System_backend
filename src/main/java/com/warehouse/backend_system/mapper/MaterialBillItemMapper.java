@@ -39,4 +39,11 @@ public interface MaterialBillItemMapper {
                 "</foreach>" +
                 "</script>")
         int batchInsert(@Param("list") List<MaterialBillItem> itemList);
+
+//根据单据id,查询单据下所有明细【新增】
+        @Select("select * from material_bill_item where bill_id = #{billId}")
+        List<MaterialBillItem> selectByBillId(@Param("billId") Long billId);
+
+
+
 }

@@ -188,4 +188,27 @@ public class MaterialBillController {
         }
     }
 
+
+    /**
+     * 草稿单据提交，转为正式出库单
+     * @param billId 草稿单据id
+     * @return Result
+     */
+
+@PostMapping("/submitDraft")
+    public Result<String> submitDraft(@RequestParam Long billId){
+        try{
+            boolean sucess = materialBillService.submitDraftBill(billId);//提交草稿单据,调用服务层方法，赋值给sucess
+            if(sucess){
+                return Result.successMsg("单据提交成功");
+            }else{
+                return Result.fail(500,"提交失败,请检查单据状态");
+            }
+        }catch (RuntimeException e){
+            return Result.fail(500,e.getMessage());
+        }
+    }
+
+
+
 }

@@ -58,6 +58,12 @@ public interface MaterialBillService {
     boolean saveDraftBill(String billNo, String billType, Long operatorId, String remark, List<MaterialBillItem> itemList);
 
 
+    /**
+     * 草稿单据提交（出库草稿转正，扣库存）
+     * @param billId 单据id
+     * @return boolean
+     */
+    boolean submitDraftBill(Long billId);
 
 
 }

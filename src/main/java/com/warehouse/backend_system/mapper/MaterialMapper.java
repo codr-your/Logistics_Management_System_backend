@@ -8,7 +8,7 @@ import java.util.List;
 public interface MaterialMapper {
     @Select("select * from material")
     List<Material> selectAll();
-
+    //根据id查询物料信息
     @Select("select * from material where id = #{id}")
     Material selectById(Long id);
 

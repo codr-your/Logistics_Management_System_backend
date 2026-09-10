@@ -253,8 +253,64 @@ public class MaterialBillServiceImpl implements MaterialBillService {
                 return true;
         }
 
+//将草稿状态下的出库单据提交为正式出库单据的实现方法
+@Override
+@Transactional(rollbackFor = Exception.class)
+public boolean submitDraftBill(Long billId) {
+        //1. 查询出库单据
+        MaterialBill bill = materialBillMapper.selectById(billId);
+        // 校验：单据存在 并且 status=0草稿 并且是出库单 billType=2
+        if(bill == null || bill.getStatus() == null || !bill.getStatus().equals(0) || !bill.getBillType().equals(2)){
+                throw new RuntimeException("单据不存在，或者不是出库草稿单据，无法提交");
+        }
 
+        //2. 根据单据id查询明细
+        List<MaterialBillItem> itemList = materialBillItemMapper.selectByBillId(billId);
+        if(itemList == null || itemList.isEmpty()){
+                throw new RuntimeException("单据明细不能为空");
+        }
 
+        //3. 查询操作员姓名（写入库存流水）
+        String operatorName = null;
+        if(bill.getOperatorId() != null){
+                SysUser operator = sysUserMapper.selectById(bill.getOperatorId());
+                if(operator != null){
+                        operatorName = operator.getRealName();
+                }
+        }
 
+        //4. 循环扣减库存 + 生成库存流水
+        for(MaterialBillItem item : itemList){
+                Material material = materialMapper.selectById(item.getMaterialId());
+                if(material == null){
+                        throw new RuntimeException("物料id:"+item.getMaterialId()+"不存在");
+                }
+                //库存校验
+                if(material.getStockNum() < item.getOperateNum()){
+                        throw new RuntimeException("物料【"+material.getMaterialName()+"】库存不足！当前库存："+material.getStockNum()+"，出库数量："+item.getOperateNum());
+                }
+                //扣减库存
+                Integer beforeStock = material.getStockNum();
+                material.setStockNum(beforeStock - item.getOperateNum());
+                materialMapper.update(material);
+
+                //库存流水：changeNum出库存负数，和正式提交submitBill逻辑一致
+                StockRecord record = new StockRecord();
+                record.setMaterialId(item.getMaterialId());
+                record.setBillItemId(item.getId());
+                record.setBeforeStock(beforeStock);
+                record.setAfterStock(material.getStockNum());
+                record.setChangeNum(-item.getOperateNum());  //修复：不再传null
+                record.setOperateType("出库");
+                record.setBillNo(bill.getBillNo());
+                record.setOperatorName(operatorName);
+                record.setCreateTime(LocalDateTime.now());
+                stockRecordMapper.insert(record);
+        }
+
+        //5. 全部成功后，单据状态 草稿0 → 已提交1，填充出库时间（只在循环外执行一次）
+        materialBillMapper.updateBillStatus(billId, 1, LocalDateTime.now());
+        return true;
+}
 
 }

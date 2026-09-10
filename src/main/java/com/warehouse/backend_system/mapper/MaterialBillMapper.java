@@ -89,6 +89,8 @@ public interface MaterialBillMapper {
     List<BillVO> getOutPieData();
     Integer getPendingOutCount();
 
-
+    int updateBillStatus(@Param("id") Long id,
+                         @Param("status") Integer status,
+                         @Param("billTime") LocalDateTime billTime);
 
 }

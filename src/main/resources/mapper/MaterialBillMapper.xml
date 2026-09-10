@@ -79,5 +79,9 @@
         WHERE bill_type = 2 AND status = 0
     </select>
 
-
+    <update id="updateBillStatus">
+        update material_bill
+        set status = #{status}, bill_time = #{billTime}
+        where id = #{id}
+    </update>
 </mapper>
