@@ -1,6 +1,8 @@
 package com.warehouse.backend_system.mapper;
 import com.warehouse.backend_system.entity.StockRecord;
 import com.warehouse.backend_system.vo.DashboardChartVO;
+import com.warehouse.backend_system.vo.StockRecordStatVO;
+import com.warehouse.backend_system.vo.StockRecordVO;
 import org.apache.ibatis.annotations.*;
 
 import java.time.LocalDateTime;
@@ -53,5 +55,38 @@ public interface StockRecordMapper {
 
     //查询最近7天的库存记录渲染图表数据
     List<DashboardChartVO> selectSevenDayRecord();
+
+
+    /**
+     * 联表查询库存流水列表，支持物料名称模糊搜索
+     * 【新增】原有代码无改动
+     */
+
+    @Select("<script>"+
+            "SELECT sr.id,m.material_code,m.material_name,sr.operate_type,sr.change_num,sr.after_stock,sr.create_time" +
+            " FROM stock_record sr" +
+            " LEFT JOIN material m ON sr.material_id = m.id"+
+            "<where>"+
+            "<if test='materialName !=null and materialName != \"\"'>"+
+            "       and m.material_name like concat('%',#{materialName},'%')" +
+            "</if>"+
+            "</where>"+
+            " order by sr.create_time desc"+
+            "</script>")
+    List<StockRecordVO> selectRecordWithMaterial(@Param("materialName") String materialName);
+
+
+    /**
+     * 获取库存记录页顶部4项统计数据
+     * 【新增】原有代码无改动；IFNULL兜底，空表时返回0，防止前端渲染空指针报错
+     */
+    @Select("SELECT " +
+            "IFNULL(COUNT(sr.id),0) AS totalRecord, " +
+            "IFNULL(SUM(IF(sr.operate_type='入库',sr.change_num,0)),0) AS totalIn, " +
+            "IFNULL(SUM(IF(sr.operate_type='出库',ABS(sr.change_num),0)),0) AS totalOut, " +
+            "(SELECT COUNT(DISTINCT id) FROM material) AS materialTypeCnt " +
+            "FROM stock_record sr")
+    StockRecordStatVO selectStockRecordStat();
+
 
 }

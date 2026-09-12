@@ -4,6 +4,9 @@ package com.warehouse.backend_system.controller;
 import com.warehouse.backend_system.entity.StockRecord;
 import com.warehouse.backend_system.service.StockRecordService;
 import com.warehouse.backend_system.util.Result;
+import com.warehouse.backend_system.vo.DashboardChartVO;
+import com.warehouse.backend_system.vo.StockRecordStatVO;
+import com.warehouse.backend_system.vo.StockRecordVO;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
@@ -54,4 +57,36 @@ public class StockRecordController {
             return Result.fail(500,"新增流水失败");
         }
     }
+
+
+
+    // ====================== 【下面是本次新增接口，追加在文件末尾，原有代码不动】 ======================
+    /**
+     * 库存流水列表【联表带物料编码、物料名称，支持物料名称模糊搜索】给库存记录页面表格使用
+     */
+    @GetMapping("/listWithMaterial")
+    public Result<List<StockRecordVO>> listWithMaterial(@RequestParam(required = false) String materialName){
+        List<StockRecordVO> list = stockRecordService.getRecordList(materialName);
+        return Result.success(list);
+    }
+
+    /**
+     * 库存记录页面顶部4张统计卡片数据
+     */
+    @GetMapping("/stat")
+    public Result<StockRecordStatVO> getStockStat(){
+        StockRecordStatVO statVO = stockRecordService.getStockStat();
+        return Result.success(statVO);
+    }
+
+    /**
+     * 近7天出入库图表统计，复用原有mapper的selectSevenDayRecord
+     */
+    @GetMapping("/sevenDayChart")
+    public Result<List<DashboardChartVO>> sevenDayChart(){
+        List<DashboardChartVO> list = stockRecordService.getSevenDayChart();
+        return Result.success(list);
+    }
+
+
 }
